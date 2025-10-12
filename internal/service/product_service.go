@@ -16,6 +16,7 @@ type ProductService interface {
 	AddProduct(request dto.ProductAddRequest) error
 	GetAllProducts() ([]dto.ProductResponse, error)
 	GetProductByID(id string) (*dto.ProductResponse, error)
+	UpdateProductQuantity(productID, quantity string) error
 }
 type productService struct {
 	logger            *logrus.Logger
@@ -91,4 +92,30 @@ func (s *productService) GetProductByID(productID string) (*dto.ProductResponse,
 		UpdatedAt: product.UpdatedAt,
 	}
 	return resp, nil
+}
+func (s *productService) UpdateProductQuantity(productID, quantity string) error {
+	newId, err := strconv.Atoi(productID)
+	if err != nil {
+		s.logger.Warnf("failed to parse productID %s to int", productID)
+		return err
+	}
+	newQuantity, err := strconv.Atoi(productID)
+	if err != nil {
+		s.logger.Warnf("failed to parse quantity %s to int", quantity)
+		return err
+	}
+	totalProduct, err := s.productRepository.CountByID(int64(newId))
+	if err != nil {
+		s.logger.WithError(err).Error("failed to count product")
+		return err
+	}
+	if totalProduct < 1 {
+		s.logger.WithError(err).Error("product not found")
+		return response.Except(404, "product not found")
+	}
+	if err := s.productRepository.UpdateQuantity(int64(newId), int64(newQuantity)); err != nil {
+		s.logger.WithError(err).Error("Failed to update product quantity")
+		return err
+	}
+	return nil
 }

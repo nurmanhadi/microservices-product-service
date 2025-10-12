@@ -10,6 +10,8 @@ type ProductRepository interface {
 	Insert(product entity.Product) error
 	FindAll() ([]entity.Product, error)
 	FindByID(id int64) (*entity.Product, error)
+	UpdateQuantity(id, quantity int64) error
+	CountByID(id int64) (int64, error)
 }
 type productRepository struct {
 	db *sqlx.DB
@@ -42,4 +44,19 @@ func (r *productRepository) FindByID(id int64) (*entity.Product, error) {
 		return nil, err
 	}
 	return &product, nil
+}
+func (r *productRepository) CountByID(id int64) (int64, error) {
+	var total int64
+	err := r.db.Get(&total, "SELECT COUNT(*) FROM products WHERE id=$1", id)
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+func (r *productRepository) UpdateQuantity(id, quantity int64) error {
+	_, err := r.db.Exec("UPDATE products SET quantity = $1 WHERE id = $2", quantity, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
