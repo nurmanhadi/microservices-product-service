@@ -16,7 +16,7 @@ type ProductService interface {
 	AddProduct(request dto.ProductAddRequest) error
 	GetAllProducts() ([]dto.ProductResponse, error)
 	GetProductByID(id string) (*dto.ProductResponse, error)
-	UpdateProductQuantity(productID, quantity string) error
+	UpdateProductBulkQuantityByID(consumer []dto.OrderConsumerResponse) error
 }
 type productService struct {
 	logger            *logrus.Logger
@@ -93,28 +93,37 @@ func (s *productService) GetProductByID(productID string) (*dto.ProductResponse,
 	}
 	return resp, nil
 }
-func (s *productService) UpdateProductQuantity(productID, quantity string) error {
-	newId, err := strconv.Atoi(productID)
+func (s *productService) UpdateProductBulkQuantityByID(consumer []dto.OrderConsumerResponse) error {
+	// if err := s.validation.Struct(consumer); err != nil {
+	// 	s.logger.WithError(err).Warn("validation failed for update status by id")
+	// 	return err
+	// }
+	ids := make([]int, 0, len(consumer))
+	for _, x := range consumer {
+		ids = append(ids, int(x.ProductID))
+	}
+	products, err := s.productRepository.FindAllByBulkID(ids)
 	if err != nil {
-		s.logger.Warnf("failed to parse productID %s to int", productID)
+		if err == sql.ErrNoRows {
+			s.logger.WithError(err).Error("products not found")
+			return err
+		}
+		s.logger.WithError(err).Error("failed to find all by bulk id")
 		return err
 	}
-	newQuantity, err := strconv.Atoi(productID)
-	if err != nil {
-		s.logger.Warnf("failed to parse quantity %s to int", quantity)
-		return err
+	quantityProducts := make([]dto.ProductUpdateBulkQuantity, 0, len(products))
+	for _, x := range products {
+		for _, y := range consumer {
+			if x.ID == y.ProductID {
+				quantityProducts = append(quantityProducts, dto.ProductUpdateBulkQuantity{
+					ID:       x.ID,
+					Quantity: (x.Quantity - y.Quantity),
+				})
+			}
+		}
 	}
-	totalProduct, err := s.productRepository.CountByID(int64(newId))
-	if err != nil {
-		s.logger.WithError(err).Error("failed to count product")
-		return err
-	}
-	if totalProduct < 1 {
-		s.logger.WithError(err).Error("product not found")
-		return response.Except(404, "product not found")
-	}
-	if err := s.productRepository.UpdateQuantity(int64(newId), int64(newQuantity)); err != nil {
-		s.logger.WithError(err).Error("Failed to update product quantity")
+	if err := s.productRepository.UpdateBulkQuantityByID(quantityProducts); err != nil {
+		s.logger.WithError(err).Error("failed to update bulk quantity by bulk id")
 		return err
 	}
 	return nil

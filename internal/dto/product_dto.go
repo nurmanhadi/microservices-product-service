@@ -15,3 +15,7 @@ type ProductResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+type ProductUpdateBulkQuantity struct {
+	ID       int64 `json:"id"`
+	Quantity int   `json:"quantity"`
+}

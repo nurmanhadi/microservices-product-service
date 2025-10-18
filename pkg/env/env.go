@@ -1,4 +1,4 @@
-package config
+package env
 
 import (
 	"os"
@@ -17,12 +17,22 @@ type dbConfig struct {
 	MaxPoolConns int
 	MaxLifetime  int
 }
-
+type brokerConfig struct {
+	VirtualHost string
+	Host        string
+	Port        string
+	Username    string
+	Password    string
+	Queue       struct {
+		Product string
+	}
+}
 type envConfig struct {
-	DB dbConfig
+	DB     dbConfig
+	Broker brokerConfig
 }
 
-var ENV envConfig
+var CONF envConfig
 
 func NewEnv() {
 	godotenv.Load()
@@ -37,7 +47,18 @@ func NewEnv() {
 		MaxPoolConns: envAsInt(os.Getenv("DB_MAX_POOL_CONNS"), 10),
 		MaxLifetime:  envAsInt(os.Getenv("DB_CONN_MAX_LIFETIME"), 300),
 	}
-	ENV.DB = envDB
+	envBroker := brokerConfig{
+		VirtualHost: os.Getenv("BROCKER_VIRTUAL_HOSTS"),
+		Host:        os.Getenv("BROKER_HOST"),
+		Port:        os.Getenv("BROKER_PORT"),
+		Username:    os.Getenv("BROKER_USERNAME"),
+		Password:    os.Getenv("BROKER_PASSWORD"),
+		Queue: struct{ Product string }{
+			Product: os.Getenv("BROCKER_QUEUE_PRODUCT_CONSUMER"),
+		},
+	}
+	CONF.DB = envDB
+	CONF.Broker = envBroker
 }
 
 func envAsInt(value string, defaultValue int) int {

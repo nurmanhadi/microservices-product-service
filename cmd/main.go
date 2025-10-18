@@ -3,15 +3,21 @@ package main
 import (
 	"product-service/config"
 	"product-service/config/database"
+	"product-service/pkg/env"
 )
 
 func main() {
-	config.NewEnv()
+	env.NewEnv()
 	logger := config.NewLogger()
 	db := database.NewSql()
+	defer db.Close()
 	validation := config.NewValidator()
 	router := config.NewRouter()
+	conn, ch := config.NewBroker()
+	defer conn.Close()
+	defer ch.Close()
 	config.Setup(&config.DependenciesConfig{
+		Ch:         ch,
 		DB:         db,
 		Logger:     logger,
 		Validation: validation,

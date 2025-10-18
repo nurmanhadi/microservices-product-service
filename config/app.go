@@ -1,6 +1,7 @@
 package config
 
 import (
+	"product-service/delivery/messaging/consumer"
 	"product-service/delivery/rest/handler"
 	"product-service/delivery/rest/routes"
 	"product-service/internal/repository"
@@ -9,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jmoiron/sqlx"
+	"github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,6 +19,7 @@ type DependenciesConfig struct {
 	Logger     *logrus.Logger
 	Validation *validator.Validate
 	Router     *gin.Engine
+	Ch         *amqp091.Channel
 }
 
 func Setup(deps *DependenciesConfig) {
@@ -35,4 +38,8 @@ func Setup(deps *DependenciesConfig) {
 		ProductHandler: productHand,
 	}
 	route.Setup()
+
+	// consumer
+	productCons := consumer.NewProductConsumer(deps.Logger, deps.Ch, productServ)
+	productCons.QueueProduct()
 }
