@@ -1,11 +1,11 @@
 package config
 
 import (
-	"product-service/delivery/messaging/consumer"
-	"product-service/delivery/rest/handler"
-	"product-service/delivery/rest/routes"
-	"product-service/internal/repository"
-	"product-service/internal/service"
+	"product-service/src/internal/repository"
+	"product-service/src/internal/service"
+	"product-service/src/messaging/consumer"
+	"product-service/src/rest/handler"
+	"product-service/src/rest/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"

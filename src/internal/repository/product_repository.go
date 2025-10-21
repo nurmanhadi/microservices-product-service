@@ -3,8 +3,8 @@ package repository
 import (
 	"fmt"
 	"log"
-	"product-service/internal/dto"
-	"product-service/internal/entity"
+	"product-service/src/dto"
+	"product-service/src/internal/entity"
 
 	"github.com/jmoiron/sqlx"
 )

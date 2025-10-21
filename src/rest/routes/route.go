@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"product-service/delivery/rest/handler"
+	"product-service/src/rest/handler"
 
 	"github.com/gin-gonic/gin"
 )

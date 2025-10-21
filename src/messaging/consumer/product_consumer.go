@@ -2,9 +2,9 @@ package consumer
 
 import (
 	"encoding/json"
-	"product-service/internal/dto"
-	"product-service/internal/service"
 	"product-service/pkg/env"
+	"product-service/src/dto"
+	"product-service/src/internal/service"
 
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"

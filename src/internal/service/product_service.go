@@ -2,10 +2,10 @@ package service
 
 import (
 	"database/sql"
-	"product-service/internal/dto"
-	"product-service/internal/entity"
-	"product-service/internal/repository"
 	"product-service/pkg/response"
+	"product-service/src/dto"
+	"product-service/src/internal/entity"
+	"product-service/src/internal/repository"
 	"strconv"
 
 	"github.com/go-playground/validator/v10"

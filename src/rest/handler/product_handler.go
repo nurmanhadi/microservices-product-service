@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"product-service/internal/dto"
-	"product-service/internal/service"
 	"product-service/pkg/response"
+	"product-service/src/dto"
+	"product-service/src/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
