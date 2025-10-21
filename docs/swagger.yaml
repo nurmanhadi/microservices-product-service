@@ -1,0 +1,76 @@
+basePath: /api/products
+definitions:
+  dto.ProductAddRequest:
+    properties:
+      name:
+        maxLength: 100
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+    required:
+    - name
+    - price
+    - quantity
+    type: object
+info:
+  contact: {}
+  description: This is a product service API server
+  termsOfService: http://swagger.io/terms/
+  title: Product Service API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Get list Products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get all Products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product
+      parameters:
+      - description: Product add data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProductAddRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+      summary: Add Product
+      tags:
+      - products
+  /{id}:
+    get:
+      description: Get product by id
+      parameters:
+      - description: Product id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get product by id
+      tags:
+      - products
+schemes:
+- http
+- https
+swagger: "2.0"

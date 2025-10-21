@@ -22,9 +22,20 @@ func NewProductHandler(productService service.ProductService) ProductHandler {
 		productService: productService,
 	}
 }
+
+// AddProduct godoc
+// @Summary Add Product
+// @Description Create a new product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param request body dto.ProductAddRequest true "Product add data"
+// @Success 201
+// @Failure 400
+// @Router / [post]
 func (h *productHandler) AddProduct(ctx *gin.Context) {
 	request := new(dto.ProductAddRequest)
-	if err := ctx.ShouldBind(&request); err != nil {
+	if err := ctx.ShouldBind(request); err != nil {
 		ctx.Error(response.Except(400, "failed to parse json"))
 		return
 	}
@@ -35,6 +46,14 @@ func (h *productHandler) AddProduct(ctx *gin.Context) {
 	}
 	response.Success(ctx, 201, "OK")
 }
+
+// GetAllProducts godoc
+// @Summary Get all Products
+// @Description Get list Products
+// @Tags products
+// @Produce json
+// @Success 200
+// @Router / [get]
 func (h *productHandler) GetAllProducts(ctx *gin.Context) {
 	result, err := h.productService.GetAllProducts()
 	if err != nil {
@@ -43,6 +62,15 @@ func (h *productHandler) GetAllProducts(ctx *gin.Context) {
 	}
 	response.Success(ctx, 200, result)
 }
+
+// GetProductByID godoc
+// @Summary Get product by id
+// @Description Get product by id
+// @Tags products
+// @Produce json
+// @Param id path string true "Product id"
+// @Success 200
+// @Router /{id} [get]
 func (h *productHandler) GetProductByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	result, err := h.productService.GetProductByID(id)
