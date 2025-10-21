@@ -5,6 +5,7 @@ import (
 	"log"
 	"product-service/src/dto"
 	"product-service/src/internal/entity"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -16,6 +17,7 @@ type ProductRepository interface {
 	FindByID(id int64) (*entity.Product, error)
 	CountByID(id int64) (int64, error)
 	UpdateBulkQuantityByID(datas []dto.ProductUpdateBulkQuantity) error
+	UpdateProduct(id int64, data dto.ProductUpdateRequest) error
 }
 type productRepository struct {
 	db *sqlx.DB
@@ -102,6 +104,36 @@ func (r *productRepository) UpdateBulkQuantityByID(datas []dto.ProductUpdateBulk
 	err = tx.Commit()
 	if err != nil {
 		return err
+	}
+	return nil
+}
+func (r *productRepository) UpdateProduct(id int64, data dto.ProductUpdateRequest) error {
+	setClaus := []string{}
+	args := []interface{}{}
+	argPos := 1
+	if data.Name != nil {
+		setClaus = append(setClaus, fmt.Sprintf("name = $%d", argPos))
+		args = append(args, data.Name)
+		argPos++
+	}
+	if data.Price != nil {
+		setClaus = append(setClaus, fmt.Sprintf("price = $%d", argPos))
+		args = append(args, data.Price)
+		argPos++
+	}
+	if data.Quantity != nil {
+		setClaus = append(setClaus, fmt.Sprintf("quantity = $%d", argPos))
+		args = append(args, data.Quantity)
+		argPos++
+	}
+	if len(setClaus) == 0 {
+		return nil
+	}
+	query := fmt.Sprintf("UPDATE products SET %s WHERE id = $%d", strings.Join(setClaus, ", "), argPos)
+	args = append(args, id)
+	_, err := r.db.Exec(query, args...)
+	if err != nil {
+		return nil
 	}
 	return nil
 }

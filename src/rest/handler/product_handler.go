@@ -12,6 +12,7 @@ type ProductHandler interface {
 	AddProduct(ctx *gin.Context)
 	GetAllProducts(ctx *gin.Context)
 	GetProductByID(ctx *gin.Context)
+	UpdateProduct(ctx *gin.Context)
 }
 type productHandler struct {
 	productService service.ProductService
@@ -45,6 +46,33 @@ func (h *productHandler) AddProduct(ctx *gin.Context) {
 		return
 	}
 	response.Success(ctx, 201, "OK")
+}
+
+// UpdateProduct godoc
+// @Summary Update Product
+// @Description Update a product by id
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path string true "Product id"
+// @Param request body dto.ProductUpdateRequest true "Product update data"
+// @Success 200
+// @Failure 400
+// @Failure 404
+// @Router /{id} [put]
+func (h *productHandler) UpdateProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
+	request := new(dto.ProductUpdateRequest)
+	if err := ctx.ShouldBind(request); err != nil {
+		ctx.Error(response.Except(400, "failed to parse json"))
+		return
+	}
+	err := h.productService.UpdateProduct(id, *request)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	response.Success(ctx, 200, "OK")
 }
 
 // GetAllProducts godoc

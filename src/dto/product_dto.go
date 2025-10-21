@@ -7,6 +7,11 @@ type ProductAddRequest struct {
 	Quantity int    `json:"quantity" validate:"required"`
 	Price    int64  `json:"price" validate:"required"`
 }
+type ProductUpdateRequest struct {
+	Name     *string `json:"name" validate:"omitempty,max=100"`
+	Quantity *int    `json:"quantity" validate:"omitempty"`
+	Price    *int64  `json:"price" validate:"omitempty"`
+}
 type ProductResponse struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name"`

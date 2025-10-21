@@ -14,6 +14,16 @@ definitions:
     - price
     - quantity
     type: object
+  dto.ProductUpdateRequest:
+    properties:
+      name:
+        maxLength: 100
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+    type: object
 info:
   contact: {}
   description: This is a product service API server
@@ -68,6 +78,34 @@ paths:
         "200":
           description: OK
       summary: Get product by id
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update a product by id
+      parameters:
+      - description: Product id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProductUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Update Product
       tags:
       - products
 schemes:

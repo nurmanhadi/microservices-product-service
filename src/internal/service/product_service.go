@@ -17,6 +17,7 @@ type ProductService interface {
 	GetAllProducts() ([]dto.ProductResponse, error)
 	GetProductByID(id string) (*dto.ProductResponse, error)
 	UpdateProductBulkQuantityByID(consumer []dto.OrderConsumerResponse) error
+	UpdateProduct(id string, request dto.ProductUpdateRequest) error
 }
 type productService struct {
 	logger            *logrus.Logger
@@ -67,7 +68,6 @@ func (s *productService) GetAllProducts() ([]dto.ProductResponse, error) {
 
 	return resp, nil
 }
-
 func (s *productService) GetProductByID(productID string) (*dto.ProductResponse, error) {
 	newId, err := strconv.Atoi(productID)
 	if err != nil {
@@ -124,6 +124,31 @@ func (s *productService) UpdateProductBulkQuantityByID(consumer []dto.OrderConsu
 	}
 	if err := s.productRepository.UpdateBulkQuantityByID(quantityProducts); err != nil {
 		s.logger.WithError(err).Error("failed to update bulk quantity by bulk id")
+		return err
+	}
+	return nil
+}
+func (s *productService) UpdateProduct(id string, request dto.ProductUpdateRequest) error {
+	if err := s.validation.Struct(&request); err != nil {
+		s.logger.WithError(err).Warn("validation failed for add product")
+		return err
+	}
+	newId, err := strconv.Atoi(id)
+	if err != nil {
+		s.logger.Warnf("failed to parse productID %s to int", id)
+		return err
+	}
+	totalProduct, err := s.productRepository.CountByID(int64(newId))
+	if err != nil {
+		s.logger.WithError(err).Error("failed to count user by id")
+		return err
+	}
+	if totalProduct < 1 {
+		s.logger.WithError(err).Warn("product not found")
+		return response.Except(404, "product not found")
+	}
+	if err := s.productRepository.UpdateProduct(int64(newId), request); err != nil {
+		s.logger.WithError(err).Error("failed to update product")
 		return err
 	}
 	return nil

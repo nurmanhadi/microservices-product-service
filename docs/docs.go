@@ -89,6 +89,48 @@ const docTemplate = `{
                         "description": "OK"
                     }
                 }
+            },
+            "put": {
+                "description": "Update a product by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Update Product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Product update data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProductUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
             }
         }
     },
@@ -100,6 +142,21 @@ const docTemplate = `{
                 "price",
                 "quantity"
             ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProductUpdateRequest": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string",

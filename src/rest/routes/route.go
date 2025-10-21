@@ -18,4 +18,5 @@ func (r *RouteConfig) Setup() {
 	product.POST("/", r.ProductHandler.AddProduct)
 	product.GET("/", r.ProductHandler.GetAllProducts)
 	product.GET("/:id", r.ProductHandler.GetProductByID)
+	product.PUT("/:id", r.ProductHandler.UpdateProduct)
 }
