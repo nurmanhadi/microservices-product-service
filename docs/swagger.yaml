@@ -1,5 +1,32 @@
-basePath: /api/products
+basePath: /api
 definitions:
+  dto.CategoryAddRequest:
+    properties:
+      name:
+        maxLength: 50
+        type: string
+    required:
+    - name
+    type: object
+  dto.CategoryAddSubRequest:
+    properties:
+      category_id:
+        type: integer
+      name:
+        maxLength: 50
+        type: string
+    required:
+    - category_id
+    - name
+    type: object
+  dto.CategoryUpdateSubRequest:
+    properties:
+      name:
+        maxLength: 50
+        type: string
+    required:
+    - name
+    type: object
   dto.ProductAddRequest:
     properties:
       name:
@@ -24,6 +51,7 @@ definitions:
       quantity:
         type: integer
     type: object
+host: localhost:4001
 info:
   contact: {}
   description: This is a product service API server
@@ -31,17 +59,129 @@ info:
   title: Product Service API
   version: "1.0"
 paths:
-  /:
+  /categories:
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category add data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryAddRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+      summary: Add category
+      tags:
+      - categories
+  /categories/:
     get:
-      description: Get list Products
+      description: Get all category with sub category
       produces:
       - application/json
       responses:
         "200":
           description: OK
-      summary: Get all Products
+      summary: Get all category
       tags:
-      - products
+      - categories
+  /categories/{id}:
+    delete:
+      description: Delete category by id without sub category or soft delete
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      summary: Delete category
+      tags:
+      - categories
+    get:
+      description: Get a category with sub category
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      summary: Get category by id, this endpoint only for category not sub category
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: update name category by id
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryUpdateSubRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Update category by id
+      tags:
+      - categories
+  /categories/sub:
+    post:
+      consumes:
+      - application/json
+      description: Create a sub category by category id
+      parameters:
+      - description: Sub category add data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryAddSubRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Add sub category
+      tags:
+      - categories
+  /products:
     post:
       consumes:
       - application/json
@@ -63,7 +203,18 @@ paths:
       summary: Add Product
       tags:
       - products
-  /{id}:
+  /products/:
+    get:
+      description: Get list Products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get all Products
+      tags:
+      - products
+  /products/{id}:
     get:
       description: Get product by id
       parameters:

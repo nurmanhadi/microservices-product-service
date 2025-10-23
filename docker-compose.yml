@@ -15,6 +15,43 @@ services:
       - data:/var/lib/postgresql/data/
     restart: always
 
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:9.1.5
+    hostname: elasticsearch
+    environment:
+      - cluster.name=user-service
+      - node.name=us-1
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - product-service
+    volumes:
+      - data:/usr/share/elasticsearch/data
+    restart: always
+  
+  kibana:
+    container_name: kibana
+    image: kibana:9.1.5
+    hostname: kibana
+    environment:
+      - SERVER_NAME=user-service
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - product-service
+    volumes:
+      - data:/usr/share/kibana/data
+    depends_on:
+      - elasticsearch
+    restart: always
+    
+
 networks:
   product-service:
     driver: bridge

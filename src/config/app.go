@@ -25,17 +25,21 @@ type DependenciesConfig struct {
 func Setup(deps *DependenciesConfig) {
 	// repository
 	productRepo := repository.NewProductRepository(deps.DB)
+	catRepo := repository.NewCategoryRepository(deps.DB)
 
 	// service
 	productServ := service.NewProductService(deps.Logger, deps.Validation, productRepo)
+	catServ := service.NewCategoryService(deps.Logger, deps.Validation, catRepo)
 
 	// handler
 	productHand := handler.NewProductHandler(productServ)
+	catHand := handler.NewCategoryHandler(catServ)
 
 	// routes
 	route := &routes.RouteConfig{
-		Router:         deps.Router,
-		ProductHandler: productHand,
+		Router:          deps.Router,
+		ProductHandler:  productHand,
+		CategoryHandler: catHand,
 	}
 	route.Setup()
 

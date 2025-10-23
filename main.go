@@ -13,7 +13,8 @@ import (
 // @version 1.0
 // @description This is a product service API server
 // @termsOfService http://swagger.io/terms/
-// @BasePath /api/products
+// @Host localhost:4001
+// @BasePath /api
 // @schemes http https
 func main() {
 	env.NewEnv()
@@ -33,7 +34,7 @@ func main() {
 		Router:     router,
 	})
 
-	docs.SwaggerInfo.BasePath = "/api/products"
+	docs.SwaggerInfo.BasePath = "/api"
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	err := router.Run(":4001")
 	if err != nil {

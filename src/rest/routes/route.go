@@ -7,8 +7,9 @@ import (
 )
 
 type RouteConfig struct {
-	Router         *gin.Engine
-	ProductHandler handler.ProductHandler
+	Router          *gin.Engine
+	ProductHandler  handler.ProductHandler
+	CategoryHandler handler.CategoryHandler
 }
 
 func (r *RouteConfig) Setup() {
@@ -19,4 +20,12 @@ func (r *RouteConfig) Setup() {
 	product.GET("/", r.ProductHandler.GetAllProducts)
 	product.GET("/:id", r.ProductHandler.GetProductByID)
 	product.PUT("/:id", r.ProductHandler.UpdateProduct)
+
+	cate := api.Group("/categories")
+	cate.POST("/", r.CategoryHandler.AddCategory)
+	cate.GET("/", r.CategoryHandler.GetAllCategory)
+	cate.POST("/sub", r.CategoryHandler.AddSubCategory)
+	cate.PUT("/:id", r.CategoryHandler.UpdateCategoryByID)
+	cate.GET("/:id", r.CategoryHandler.GetCategoryByID)
+	cate.DELETE("/:id", r.CategoryHandler.DeleteCategoryByID)
 }

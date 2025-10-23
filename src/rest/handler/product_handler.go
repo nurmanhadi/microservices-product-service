@@ -33,7 +33,7 @@ func NewProductHandler(productService service.ProductService) ProductHandler {
 // @Param request body dto.ProductAddRequest true "Product add data"
 // @Success 201
 // @Failure 400
-// @Router / [post]
+// @Router /products [post]
 func (h *productHandler) AddProduct(ctx *gin.Context) {
 	request := new(dto.ProductAddRequest)
 	if err := ctx.ShouldBind(request); err != nil {
@@ -59,7 +59,7 @@ func (h *productHandler) AddProduct(ctx *gin.Context) {
 // @Success 200
 // @Failure 400
 // @Failure 404
-// @Router /{id} [put]
+// @Router /products/{id} [put]
 func (h *productHandler) UpdateProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	request := new(dto.ProductUpdateRequest)
@@ -81,7 +81,7 @@ func (h *productHandler) UpdateProduct(ctx *gin.Context) {
 // @Tags products
 // @Produce json
 // @Success 200
-// @Router / [get]
+// @Router /products/ [get]
 func (h *productHandler) GetAllProducts(ctx *gin.Context) {
 	result, err := h.productService.GetAllProducts()
 	if err != nil {
@@ -98,7 +98,7 @@ func (h *productHandler) GetAllProducts(ctx *gin.Context) {
 // @Produce json
 // @Param id path string true "Product id"
 // @Success 200
-// @Router /{id} [get]
+// @Router /products/{id} [get]
 func (h *productHandler) GetProductByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	result, err := h.productService.GetProductByID(id)

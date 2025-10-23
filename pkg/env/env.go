@@ -35,7 +35,11 @@ type envConfig struct {
 var CONF envConfig
 
 func NewEnv() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		_ = godotenv.Load("../.env")
+		_ = godotenv.Load("../../.env")
+	}
 
 	envDB := dbConfig{
 		Host:         os.Getenv("DB_HOST"),
