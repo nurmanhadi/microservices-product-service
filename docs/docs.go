@@ -202,6 +202,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/product-categories": {
+            "post": {
+                "description": "Create relation many to many for product and category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product-categories"
+                ],
+                "summary": "Add Product Category",
+                "parameters": [
+                    {
+                        "description": "Product category add data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ProductCategoryAddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/product-categories/{id}": {
+            "delete": {
+                "description": "Delete relation many to many for product and category",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product-categories"
+                ],
+                "summary": "Delete Product Category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/products": {
             "post": {
                 "description": "Create a new product",
@@ -379,6 +445,21 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ProductCategoryAddRequest": {
+            "type": "object",
+            "required": [
+                "category_id",
+                "product_id"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "product_id": {
                     "type": "integer"
                 }
             }

@@ -135,7 +135,7 @@ func (s *productService) UpdateProduct(id string, request dto.ProductUpdateReque
 	}
 	newId, err := strconv.Atoi(id)
 	if err != nil {
-		s.logger.Warnf("failed to parse productID %s to int", id)
+		s.logger.WithError(err).Error("failed to parse string to int")
 		return err
 	}
 	totalProduct, err := s.productRepository.CountByID(int64(newId))

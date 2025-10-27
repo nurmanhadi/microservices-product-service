@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"log"
 	"product-service/src/dto"
 	"product-service/src/internal/entity"
 	"strings"
@@ -18,6 +17,7 @@ type ProductRepository interface {
 	CountByID(id int64) (int64, error)
 	UpdateBulkQuantityByID(datas []dto.ProductUpdateBulkQuantity) error
 	UpdateProduct(id int64, data dto.ProductUpdateRequest) error
+	FindInID(ids []int64) ([]entity.Product, error)
 }
 type productRepository struct {
 	db *sqlx.DB
@@ -92,7 +92,6 @@ func (r *productRepository) UpdateBulkQuantityByID(datas []dto.ProductUpdateBulk
 	if err != nil {
 		return err
 	}
-	log.Println(query)
 	_, err = tx.Exec(query, args...)
 	if err != nil {
 		err := tx.Rollback()
@@ -136,4 +135,18 @@ func (r *productRepository) UpdateProduct(id int64, data dto.ProductUpdateReques
 		return nil
 	}
 	return nil
+}
+func (r *productRepository) FindInID(ids []int64) ([]entity.Product, error) {
+	query := "SELECT * FROM products WHERE id IN(?)"
+	finalQuery, args, err := sqlx.In(query, ids)
+	if err != nil {
+		return nil, err
+	}
+	endQuery := r.db.Rebind(finalQuery)
+	var products []entity.Product
+	err = r.db.Select(&products, endQuery, args...)
+	if err != nil {
+		return nil, err
+	}
+	return products, err
 }

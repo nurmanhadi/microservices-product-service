@@ -41,6 +41,16 @@ definitions:
     - price
     - quantity
     type: object
+  dto.ProductCategoryAddRequest:
+    properties:
+      category_id:
+        type: integer
+      product_id:
+        type: integer
+    required:
+    - category_id
+    - product_id
+    type: object
   dto.ProductUpdateRequest:
     properties:
       name:
@@ -181,6 +191,49 @@ paths:
       summary: Add sub category
       tags:
       - categories
+  /product-categories:
+    post:
+      consumes:
+      - application/json
+      description: Create relation many to many for product and category
+      parameters:
+      - description: Product category add data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProductCategoryAddRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Add Product Category
+      tags:
+      - product-categories
+  /product-categories/{id}:
+    delete:
+      description: Delete relation many to many for product and category
+      parameters:
+      - description: Product category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+      summary: Delete Product Category
+      tags:
+      - product-categories
   /products:
     post:
       consumes:
