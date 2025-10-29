@@ -12,14 +12,16 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
+	"github.com/typesense/typesense-go/v3/typesense"
 )
 
 type DependenciesConfig struct {
-	DB         *sqlx.DB
-	Logger     *logrus.Logger
-	Validation *validator.Validate
-	Router     *gin.Engine
-	Ch         *amqp091.Channel
+	DB           *sqlx.DB
+	Logger       *logrus.Logger
+	Validation   *validator.Validate
+	Router       *gin.Engine
+	Ch           *amqp091.Channel
+	SearchEngine *typesense.Client
 }
 
 func Setup(deps *DependenciesConfig) {

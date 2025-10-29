@@ -26,12 +26,14 @@ func main() {
 	conn, ch := config.NewBroker()
 	defer conn.Close()
 	defer ch.Close()
+	searchEngine := config.NewSearchEngine()
 	config.Setup(&config.DependenciesConfig{
-		Ch:         ch,
-		DB:         db,
-		Logger:     logger,
-		Validation: validation,
-		Router:     router,
+		Ch:           ch,
+		DB:           db,
+		Logger:       logger,
+		Validation:   validation,
+		Router:       router,
+		SearchEngine: searchEngine,
 	})
 
 	docs.SwaggerInfo.BasePath = "/api"

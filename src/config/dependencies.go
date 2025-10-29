@@ -13,6 +13,7 @@ import (
 	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
+	"github.com/typesense/typesense-go/v3/typesense"
 )
 
 func NewSql() *sqlx.DB {
@@ -63,4 +64,15 @@ func NewBroker() (*amqp.Connection, *amqp.Channel) {
 		log.Fatalf("failed to open channel broker: %s", err.Error())
 	}
 	return conn, ch
+}
+func NewSearchEngine() *typesense.Client {
+	client := typesense.NewClient(
+		typesense.WithServer(fmt.Sprintf("%s:%s", env.CONF.SearchEngine.Host, env.CONF.SearchEngine.Port)),
+		typesense.WithAPIKey(env.CONF.SearchEngine.ApiKey),
+		typesense.WithConnectionTimeout(5*time.Second),
+		typesense.WithCircuitBreakerMaxRequests(50),
+		typesense.WithCircuitBreakerInterval(2*time.Minute),
+		typesense.WithCircuitBreakerTimeout(1*time.Minute),
+	)
+	return client
 }

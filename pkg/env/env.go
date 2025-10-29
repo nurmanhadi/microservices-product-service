@@ -27,9 +27,15 @@ type brokerConfig struct {
 		Product string
 	}
 }
+type searchEngineConfig struct {
+	Host   string
+	Port   string
+	ApiKey string
+}
 type envConfig struct {
-	DB     dbConfig
-	Broker brokerConfig
+	DB           dbConfig
+	Broker       brokerConfig
+	SearchEngine searchEngineConfig
 }
 
 var CONF envConfig
@@ -61,8 +67,14 @@ func NewEnv() {
 			Product: os.Getenv("BROCKER_QUEUE_PRODUCT_CONSUMER"),
 		},
 	}
+	envSearchEngine := searchEngineConfig{
+		Host:   os.Getenv("SE_HOST"),
+		Port:   os.Getenv("SE_PORT"),
+		ApiKey: os.Getenv("SE_API_KEY"),
+	}
 	CONF.DB = envDB
 	CONF.Broker = envBroker
+	CONF.SearchEngine = envSearchEngine
 }
 
 func envAsInt(value string, defaultValue int) int {

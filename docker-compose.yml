@@ -15,42 +15,29 @@ services:
       - data:/var/lib/postgresql/data/
     restart: always
 
-  elasticsearch:
-    container_name: elasticsearch
-    image: elasticsearch:9.1.5
-    hostname: elasticsearch
-    environment:
-      - cluster.name=user-service
-      - node.name=us-1
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+  typesense:
+    image: typesense/typesense:30.0.rc26
+    container_name: typesense
+    hostname: typesense
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - "8108:8108"
     networks:
       - product-service
     volumes:
-      - data:/usr/share/elasticsearch/data
-    restart: always
+      - data:/typesense/data
+    command: >
+      --data-dir /typesense/data
+      --api-key=${SE_API_KEY}
+      --enable-cors
   
-  kibana:
-    container_name: kibana
-    image: kibana:9.1.5
-    hostname: kibana
-    environment:
-      - SERVER_NAME=user-service
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  typesense-dashboard:
+    image: bfritscher/typesense-dashboard:latest
+    container_name: typesense-dashboard
+    hostname: typesense-dashboard
     ports:
-      - "5601:5601"
+      - "8109:80"
     networks:
       - product-service
-    volumes:
-      - data:/usr/share/kibana/data
-    depends_on:
-      - elasticsearch
-    restart: always
-    
 
 networks:
   product-service:
