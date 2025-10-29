@@ -6,6 +6,7 @@ import (
 	"product-service/src/messaging/consumer"
 	"product-service/src/rest/handler"
 	"product-service/src/rest/routes"
+	searchengine "product-service/src/search-engine"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -25,13 +26,16 @@ type DependenciesConfig struct {
 }
 
 func Setup(deps *DependenciesConfig) {
+	// search engine
+	client := searchengine.NewClientSearchEngine(deps.SearchEngine)
+
 	// repository
 	productRepo := repository.NewProductRepository(deps.DB)
 	catRepo := repository.NewCategoryRepository(deps.DB)
 	productCategoryRepo := repository.NewProductCategoryRepository(deps.DB)
 
 	// service
-	productServ := service.NewProductService(deps.Logger, deps.Validation, productRepo)
+	productServ := service.NewProductService(deps.Logger, deps.Validation, productRepo, client)
 	catServ := service.NewCategoryService(deps.Logger, deps.Validation, catRepo)
 	productCategoryServ := service.NewproductCategoryService(deps.Logger, deps.Validation, productCategoryRepo, productRepo, catRepo)
 

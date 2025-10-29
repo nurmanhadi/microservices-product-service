@@ -2,10 +2,13 @@ package service
 
 import (
 	"database/sql"
+	"fmt"
 	"product-service/pkg/response"
 	"product-service/src/dto"
 	"product-service/src/internal/entity"
 	"product-service/src/internal/repository"
+	searchengine "product-service/src/search-engine"
+	"product-service/src/search-engine/collection"
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
@@ -23,13 +26,15 @@ type productService struct {
 	logger            *logrus.Logger
 	validation        *validator.Validate
 	productRepository repository.ProductRepository
+	searchEngine      searchengine.ClientSearchEngine
 }
 
-func NewProductService(logger *logrus.Logger, validation *validator.Validate, productRepository repository.ProductRepository) ProductService {
+func NewProductService(logger *logrus.Logger, validation *validator.Validate, productRepository repository.ProductRepository, searchEngine searchengine.ClientSearchEngine) ProductService {
 	return &productService{
 		logger:            logger,
 		validation:        validation,
 		productRepository: productRepository,
+		searchEngine:      searchEngine,
 	}
 }
 func (s *productService) AddProduct(request dto.ProductAddRequest) error {
@@ -42,10 +47,35 @@ func (s *productService) AddProduct(request dto.ProductAddRequest) error {
 		Quantity: request.Quantity,
 		Price:    request.Price,
 	}
-	if err := s.productRepository.Insert(*product); err != nil {
+	productID, err := s.productRepository.Insert(*product)
+	if err != nil {
 		s.logger.WithError(err).Error("Failed to insert new product")
 		return err
 	}
+	go func(id int64, logger *logrus.Logger, productRepository repository.ProductRepository, searchEngine searchengine.ClientSearchEngine) {
+		product, err := s.productRepository.FindByID(productID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				s.logger.WithError(err).Warn("product not found")
+				return
+			}
+			s.logger.WithError(err).Error("failed to find by id")
+			return
+		}
+		newDocument := collection.ProductCollection{
+			ID:        fmt.Sprint(product.ID),
+			Name:      product.Name,
+			Quantity:  product.Quantity,
+			Price:     product.Price,
+			CreatedAt: product.CreatedAt.Unix(),
+			UpdatedAt: product.UpdatedAt.Unix(),
+		}
+		err = s.searchEngine.UpsertProduct(newDocument)
+		if err != nil {
+			s.logger.WithError(err).Error("failed to upsert product collection to search engine")
+			return
+		}
+	}(productID, s.logger, s.productRepository, s.searchEngine)
 	return nil
 }
 func (s *productService) GetAllProducts() ([]dto.ProductResponse, error) {

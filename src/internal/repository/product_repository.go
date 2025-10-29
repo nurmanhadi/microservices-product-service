@@ -10,7 +10,7 @@ import (
 )
 
 type ProductRepository interface {
-	Insert(product entity.Product) error
+	Insert(product entity.Product) (int64, error)
 	FindAll() ([]entity.Product, error)
 	FindAllByBulkID(ids []int) ([]entity.Product, error)
 	FindByID(id int64) (*entity.Product, error)
@@ -28,12 +28,13 @@ func NewProductRepository(db *sqlx.DB) ProductRepository {
 		db: db,
 	}
 }
-func (r *productRepository) Insert(product entity.Product) error {
-	_, err := r.db.Exec("INSERT INTO products(name, quantity, price) VALUES($1, $2, $3)", product.Name, product.Quantity, product.Price)
+func (r *productRepository) Insert(product entity.Product) (int64, error) {
+	var id int64
+	err := r.db.QueryRow("INSERT INTO products(name, quantity, price) VALUES($1, $2, $3) RETURNING id", product.Name, product.Quantity, product.Price).Scan(&id)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return id, nil
 }
 func (r *productRepository) FindAll() ([]entity.Product, error) {
 	products := []entity.Product{}

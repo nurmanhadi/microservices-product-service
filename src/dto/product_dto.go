@@ -13,12 +13,13 @@ type ProductUpdateRequest struct {
 	Price    *int64  `json:"price" validate:"omitempty"`
 }
 type ProductResponse struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	Quantity  int       `json:"quantity"`
-	Price     int64     `json:"price"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         int64              `json:"id"`
+	Name       string             `json:"name"`
+	Quantity   int                `json:"quantity"`
+	Price      int64              `json:"price"`
+	CreatedAt  time.Time          `json:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at"`
+	Categories []CategoryResponse `json:"categories"`
 }
 type ProductUpdateBulkQuantity struct {
 	ID       int64 `json:"id"`
